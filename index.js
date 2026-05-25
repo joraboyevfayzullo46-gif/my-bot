@@ -113,31 +113,6 @@ Bu bot orqali:
         error:
 `❌ Server temporarily unavailable
 🔄 Please try again later`,
-        // ===== AR =====
-    return {
-        welcome:
-`🔥 مرحبًا!
-
-🎥 VideoSaveBot
-
-⭕ يمكنك تحويل مقاطع الفيديو العادية إلى تنسيق فيديو دائري
-
-📹 فقط أرسل فيديو
-🚀 سوف يرسل لك الروبوت مقطع فيديو دائريًا نهائيًا
-
-😎 يمكن للبوت أيضًا العمل في مجموعات!`,
-
-        loading:
-`📥 يتم تشغيل الفيديو
-⏳ من فضلك انتظر لحظة`,
-
-        success:
-`✅ تم إنشاء الفيديو بنجاح`,
-
-        error:
-`❌ الخادم معطل مؤقتا
-🔄 يرجى المحاولة مرة أخرى في وقت لاحق`,
-    
 
         select:
 `🌍 Select language`
@@ -154,8 +129,7 @@ bot.onText(/\/start/, (msg) => {
                 keyboard: [
                     ["🇺🇿 O'zbekcha"],
                     ["🇷🇺 Русский"],
-                    ["🇺🇸 English"],
-                    ["🇸🇦 Arabic"]
+                    ["🇺🇸 English"]
                 ],
                 resize_keyboard: true
             }
@@ -204,16 +178,6 @@ bot.on('message', async (msg) => {
             text('en').welcome
         );
     }
-    // ===== AR =====
-    if (message === "🇸🇦 Arabic") {
-
-        users[chatId] = "ar";
-
-        return bot.sendMessage(
-            chatId,
-            text('ar').welcome
-        );
-            }
 
 });
 
