@@ -32,7 +32,7 @@ function text(lang) {
             welcome:
 `🔥 Assalomu alaykum!
 
-🎥 VideoSaveBot ga xush kelibsiz
+🎥 DumaloqVideoBot ga xush kelibsiz
 
 Bu bot orqali:
 ⭕ Oddiy videolarni dumaloq video shakliga o'tkazishingiz mumkin
@@ -64,7 +64,7 @@ Bu bot orqali:
             welcome:
 `🔥 Добро пожаловать!
 
-🎥 VideoSaveBot
+🎥 DumaloqVideoBot
 
 ⭕ Этот бот превращает обычные видео в круглые видео Telegram
 
@@ -94,7 +94,7 @@ Bu bot orqali:
         welcome:
 `🔥 Welcome!
 
-🎥 VideoSaveBot
+🎥 DumaloqVideoBot
 
 ⭕ Convert normal videos into Telegram round videos
 
