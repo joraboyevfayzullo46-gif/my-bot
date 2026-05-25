@@ -3,234 +3,322 @@ const fs = require('fs');
 const ffmpeg = require('fluent-ffmpeg');
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const express = require('express');
-const https = require('https');
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
 // ================= SERVER =================
 const app = express();
-app.get('/', (req, res) => res.send('Bot ishlayapti ✅'));
+
+app.get('/', (req, res) => {
+    res.send('Bot ishlayapti ✅');
+});
+
 app.listen(process.env.PORT || 3000);
 
 // ================= BOT =================
-const bot = new TelegramBot(process.env.TOKEN, { polling: true });
+const bot = new TelegramBot(process.env.TOKEN, {
+    polling: true
+});
 
-// ================= STORAGE =================
+// ================= LANG STORAGE =================
 let users = {};
-let videoData = {};
 
-// ================= TEXT =================
+// ================= TEXT SYSTEM =================
 function text(lang) {
-    const t = {
-        uz: {
-            start: "Assalomu alaykum @yumaloqdumaloqbot ga xush kelibsiz",
-            welcome: "🔥 Xush kelibsiz!",
-            settings: "⚙️ Sozlamalar",
-            more: "➕ Qo‘shimcha funksiyalar",
-            quality: "🎚 Sifatni tanlang",
-            loading: "⏳ Ishlanmoqda...",
-            done: "✅ Tayyor!",
-            error: "❌ Xatolik"
-        },
-        en: {
-            start: "👋 Hello!\n\n🎥 Send video",
-            welcome: "🔥 Welcome!",
-            settings: "⚙️ Settings",
-            more: "➕ More features",
-            quality: "🎚 Select quality",
-            loading: "⏳ Processing...",
-            done: "✅ Done!",
-            error: "❌ Error"
-        }
-    };
 
-    return t[lang] || t.en;
-}
+    // ===== UZ =====
+    if (lang === 'uz') {
+        return {
+            welcome:
+`🔥 Assalomu alaykum!
 
-// ================= KEYBOARDS =================
-function langMenu() {
+🎥 VideoSaveBot ga xush kelibsiz
+
+Bu bot orqali:
+⭕ Oddiy videolarni dumaloq video shakliga o'tkazishingiz mumkin
+
+📹 Shunchaki video yuboring
+🚀 Bot sizga tayyor dumaloq videoni yuboradi
+
+😎 Bot guruhlarda ham ishlay oladi!`,
+
+            loading:
+`📥 Video aylantirilmoqda...
+⏳ Iltimos biroz kuting`,
+
+            success:
+`✅ Video muvaffaqiyatli tayyorlandi`,
+
+            error:
+`❌ Server vaqtincha ishlamayapti
+🔄 Iltimos keyinroq urinib ko‘ring`,
+
+            select:
+`🌍 Tilni tanlang`
+        };
+    }
+
+    // ===== RU =====
+    if (lang === 'ru') {
+        return {
+            welcome:
+`🔥 Добро пожаловать!
+
+🎥 VideoSaveBot
+
+⭕ Этот бот превращает обычные видео в круглые видео Telegram
+
+📹 Просто отправьте видео
+🚀 И бот отправит готовое круглое видео
+
+😎 Работает и в группах!`,
+
+            loading:
+`📥 Видео обрабатывается...
+⏳ Пожалуйста подождите`,
+
+            success:
+`✅ Видео успешно готово`,
+
+            error:
+`❌ Сервер временно недоступен
+🔄 Попробуйте позже`,
+
+            select:
+`🌍 Выберите язык`
+        };
+    }
+
+    // ===== EN =====
     return {
-        inline_keyboard: [
-            [{ text: "🇺🇿 Uzbek", callback_data: "lang_uz" }],
-            [{ text: "🇺🇸 English", callback_data: "lang_en" }]
-        ]
-    };
-}
+        welcome:
+`🔥 Welcome!
 
-function mainMenu(lang) {
-    return {
-        reply_markup: {
-            keyboard: [
-                [text(lang).settings],
-                [text(lang).more]
-            ],
-            resize_keyboard: true
-        }
-    };
-}
+🎥 VideoSaveBot
 
-function moreMenu(lang) {
-    return {
-        inline_keyboard: [
-            [{ text: "✂️ Trim", callback_data: "trim" }],
-            [{ text: "🎵 MP3", callback_data: "mp3" }],
-            [{ text: "🖼 Watermark", callback_data: "wm" }],
-            [{ text: "📦 Compress", callback_data: "comp" }],
-            [{ text: "📱 9:16 TikTok", callback_data: "tiktok" }]
-        ]
-    };
-}
+⭕ Convert normal videos into Telegram round videos
 
-function qualityMenu() {
+📹 Just send a video
+🚀 Bot will send round video instantly
+
+😎 Works in groups too!`,
+
+        loading:
+`📥 Processing video...
+⏳ Please wait`,
+
+        success:
+`✅ Video ready`,
+
+        error:
+`❌ Server temporarily unavailable
+🔄 Please try again later`,
+        // ===== AR =====
     return {
-        inline_keyboard: [
-            [{ text: "📺 360p", callback_data: "q_360" }],
-            [{ text: "📺 480p", callback_data: "q_480" }],
-            [{ text: "📺 720p", callback_data: "q_720" }]
-        ]
+        welcome:
+`🔥 مرحبًا!
+
+🎥 VideoSaveBot
+
+⭕ يمكنك تحويل مقاطع الفيديو العادية إلى تنسيق فيديو دائري
+
+📹 فقط أرسل فيديو
+🚀 سوف يرسل لك الروبوت مقطع فيديو دائريًا نهائيًا
+
+😎 يمكن للبوت أيضًا العمل في مجموعات!`,
+
+        loading:
+`📥 يتم تشغيل الفيديو
+⏳ من فضلك انتظر لحظة`,
+
+        success:
+`✅ تم إنشاء الفيديو بنجاح`,
+
+        error:
+`❌ الخادم معطل مؤقتا
+🔄 يرجى المحاولة مرة أخرى في وقت لاحق`,
+    
+
+        select:
+`🌍 Select language`
     };
 }
 
 // ================= START =================
 bot.onText(/\/start/, (msg) => {
-    bot.sendMessage(msg.chat.id,
-        "👋 Hello / Salom\n🌍 Tilni tanlang",
-        { reply_markup: langMenu() }
+
+    bot.sendMessage(
+        msg.chat.id,
+        `🌍 Select Language / Tilni tanlang`, {
+            reply_markup: {
+                keyboard: [
+                    ["🇺🇿 O'zbekcha"],
+                    ["🇷🇺 Русский"],
+                    ["🇺🇸 English"],
+                    ["🇸🇦 Arabic"]
+                ],
+                resize_keyboard: true
+            }
+        }
     );
-});
 
-// ================= SETTINGS / MENU =================
-bot.on('message', (msg) => {
-
-    const chatId = msg.chat.id;
-    const lang = users[chatId] || 'en';
-
-    if (msg.text === text(lang).settings) {
-        return bot.sendMessage(chatId, "🌍 Select language", {
-            reply_markup: langMenu()
-        });
-    }
-
-    if (msg.text === text(lang).more) {
-        return bot.sendMessage(chatId, "➕ Features", {
-            reply_markup: moreMenu(lang)
-        });
-    }
 });
 
 // ================= LANGUAGE =================
-bot.on('callback_query', async (q) => {
+bot.on('message', async (msg) => {
 
-    const chatId = q.message.chat.id;
-    const data = q.data;
+    const chatId = msg.chat.id;
+    const message = msg.text;
 
-    // 🌍 LANG
-    if (data.startsWith("lang_")) {
-        const lang = data.split("_")[1];
-        users[chatId] = lang;
+    if (!message) return;
 
-        await bot.answerCallbackQuery(q.id);
+    // ===== UZ =====
+    if (message === "🇺🇿 O'zbekcha") {
 
-        return bot.sendMessage(chatId, text(lang).welcome, mainMenu(lang));
+        users[chatId] = "uz";
+
+        return bot.sendMessage(
+            chatId,
+            text('uz').welcome
+        );
     }
 
-    // 🎬 SAVE ACTION
-    if (['trim','mp3','wm','comp','tiktok'].includes(data)) {
-        videoData[chatId].action = data;
-        return bot.sendMessage(chatId, "🎚 Sifat tanlang", {
-            reply_markup: qualityMenu()
-        });
+    // ===== RU =====
+    if (message === "🇷🇺 Русский") {
+
+        users[chatId] = "ru";
+
+        return bot.sendMessage(
+            chatId,
+            text('ru').welcome
+        );
     }
 
-    // 🎚 QUALITY
-    if (data.startsWith("q_")) {
-        const ql = data.split("_")[1];
-        videoData[chatId].quality = ql;
+    // ===== EN =====
+    if (message === "🇺🇸 English") {
 
-        return bot.sendMessage(chatId, "📥 Video yuboring");
+        users[chatId] = "en";
+
+        return bot.sendMessage(
+            chatId,
+            text('en').welcome
+        );
     }
+    // ===== AR =====
+    if (message === "🇸🇦 Arabic") {
 
-    bot.answerCallbackQuery(q.id);
+        users[chatId] = "ar";
+
+        return bot.sendMessage(
+            chatId,
+            text('ar').welcome
+        );
+            }
+
 });
 
-// ================= VIDEO =================
+// ================= VIDEO HANDLER =================
 bot.on('video', async (msg) => {
 
     const chatId = msg.chat.id;
+
     const lang = users[chatId] || 'en';
 
-    const fileId = msg.video.file_id;
-    const fileLink = await bot.getFileLink(fileId);
+    try {
 
-    const input = `in_${chatId}.mp4`;
-    const output = `out_${chatId}.mp4`;
+        bot.sendMessage(
+            chatId,
+            text(lang).loading
+        );
 
-    videoData[chatId] = {
-        action: 'circle',
-        quality: 720
-    };
+        // ===== GET FILE =====
+        const fileId = msg.video.file_id;
 
-    bot.sendMessage(chatId, "⏳ Processing... 0%");
+        const fileLink = await bot.getFileLink(fileId);
 
-    const file = fs.createWriteStream(input);
+        // ===== FILE PATH =====
+        const inputPath = `input_${chatId}.mp4`;
+        const outputPath = `output_${chatId}.mp4`;
 
-    https.get(fileLink, (res) => {
-        res.pipe(file);
+        // ===== DOWNLOAD =====
+        const response = await fetch(fileLink);
 
-        file.on('finish', () => {
+        const buffer = await response.arrayBuffer();
 
-            bot.sendMessage(chatId, "⏳ 40%");
+        fs.writeFileSync(
+            inputPath,
+            Buffer.from(buffer)
+        );
 
-            const action = videoData[chatId].action;
+        // ===== FFMPEG =====
+        ffmpeg(inputPath)
 
-            let cmd = "";
+            .videoFilters([
+                "crop='min(iw,ih)':'min(iw,ih)'",
+                "scale=640:640"
+            ])
 
-            if (action === "circle") {
-                cmd = `-vf "crop='min(iw,ih)':'min(iw,ih)',scale=640:640"`;
-            }
+            .outputOptions([
+                '-c:v libx264',
+                '-preset veryfast',
+                '-crf 28'
+            ])
 
-            if (action === "tiktok") {
-                cmd = `-vf "scale=720:1280"`;
-            }
+            .save(outputPath)
 
-            if (action === "mp3") {
-                cmd = `-vn`;
-            }
+            .on('end', async () => {
 
-            if (action === "wm") {
-                cmd = `-vf "drawtext=text='@Bot':x=10:y=10"`;
-            }
+                // ===== SEND VIDEO NOTE =====
+                await bot.sendVideoNote(
+                    chatId,
+                    outputPath
+                );
 
-            if (action === "comp") {
-                cmd = `-crf 32`;
-            }
+                bot.sendMessage(
+                    chatId,
+                    text(lang).success
+                );
 
-            ffmpeg(input)
-                .outputOptions(cmd)
-                .save(output)
-                .on('progress', () => {
-                    bot.sendMessage(chatId, "⏳ 70%");
-                })
-                .on('end', async () => {
+                // ===== DELETE FILES =====
+                if (fs.existsSync(inputPath)) {
+                    fs.unlinkSync(inputPath);
+                }
 
-                    bot.sendMessage(chatId, "⏳ 100%");
+                if (fs.existsSync(outputPath)) {
+                    fs.unlinkSync(outputPath);
+                }
 
-                    if (action === "mp3") {
-                        await bot.sendAudio(chatId, output);
-                    } else {
-                        await bot.sendVideoNote(chatId, output);
-                    }
+            })
 
-                    bot.sendMessage(chatId, "✅ Done!");
+            .on('error', async (err) => {
 
-                    fs.unlinkSync(input);
-                    fs.unlinkSync(output);
-                })
-                .on('error', (err) => {
-                    console.log(err);
-                    bot.sendMessage(chatId, "❌ Error");
-                });
+                console.log(err);
 
-        });
-    });
+                bot.sendMessage(
+                    chatId,
+                    text(lang).error
+                );
+
+                // ===== DELETE =====
+                if (fs.existsSync(inputPath)) {
+                    fs.unlinkSync(inputPath);
+                }
+
+                if (fs.existsSync(outputPath)) {
+                    fs.unlinkSync(outputPath);
+                }
+
+            });
+
+    } catch (err) {
+
+        console.log(err);
+
+        bot.sendMessage(
+            chatId,
+            text(lang).error
+        );
+
+    }
+
 });
